@@ -17,3 +17,6 @@ eureka:
 #使两个server互相注册的办法是，先以defaultZone: http://localhost:8762/eureka/的配置运行ImoocEurekaApplication1
 #然后将defaultZone: http://localhost:8762/eureka/改成defaultZone: http://localhost:8762/eureka/
 #之后运行ImoocEurekaApplication2
+#要是两个服务互相注册需要将下面一句注释掉
+server:
+  port: 8761
