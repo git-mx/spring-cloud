@@ -3,7 +3,7 @@ package com.shyfay.product.exception;
 import com.shyfay.product.enums.ResultEnum;
 
 /**
- * Created by 廖师兄
+ * Created by mx
  * 2017-12-10 22:59
  */
 public class ProductException extends RuntimeException {
