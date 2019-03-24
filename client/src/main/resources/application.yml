@@ -1,0 +1,10 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  #以下设置是为了在eureka管理页面点击client的时候跳转到的地址名称，例如http://clientName/actuator/info
+  #但并不是每次都生效
+  instance: clinetName
+spring:
+  application:
+    name: client
