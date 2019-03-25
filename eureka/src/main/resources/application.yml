@@ -1,14 +1,14 @@
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-    #将自己身注册成为client功能关闭，如果打开的话，启动server会在server管理端看到一个在线的application
-    register-with-eureka: false
-  #enreka server有一个健康检查机制，即当发现某一个注册的服务经常都不在线时，就会在
-  #注册中心的管理界面抛出警告给运维人员查阅，我们在开发环境可以做如下设置，来关闭警告功能
-  #但是生产环境最好保持该功能开启
-  server:
-    enable-self-preservation: false
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://127.0.0.1:80/eureka/
+#    #将自己身注册成为client功能关闭，如果打开的话，启动server会在server管理端看到一个在线的application
+#    register-with-eureka: false
+#  #enreka server有一个健康检查机制，即当发现某一个注册的服务经常都不在线时，就会在
+#  #注册中心的管理界面抛出警告给运维人员查阅，我们在开发环境可以做如下设置，来关闭警告功能
+#  #但是生产环境最好保持该功能开启
+#  server:
+#    enable-self-preservation: false
 
 #如何在同一个项目里启动EurekaApplication1和EurekaApplication2呢，首先是在右上角那点击Edit Configuration
 #然后在左上角点击copy configuration 然后命名，
@@ -19,5 +19,23 @@ eureka:
 #之后运行EurekaApplication2
 #要是两个服务互相注册需要将下面一句注释掉
 #这里设置一下端口用于在命令行启动
+#logging:
+#  file: /usr/local/tomcat/shyfay-eureka.log
+#  pattern:
+#    level: info
+#    file: "[shyfay-eureka] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level = > %msg%n"
+#  level:
+#    com:
+#      shyfay:
+#        admin:
+#          dao: debug
+
+spring:
+  application:
+    name: eureka-server
 server:
   port: 8761
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
