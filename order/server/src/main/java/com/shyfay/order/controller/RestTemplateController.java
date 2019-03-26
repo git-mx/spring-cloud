@@ -30,12 +30,12 @@ public class RestTemplateController {
         //RestTemplate restTemplate = new RestTemplate();
         //String response = restTemplate.getForObject("http://localhost:8081/server/msg", String.class);
         //第二种方式，对方服务启动了多个副本，使用集群的方式部署，这时就要要用到eureka了
-        ServiceInstance serviceInstance = loadBalancerClient.choose("IMOOC-PRODUCT");
+        ServiceInstance serviceInstance = loadBalancerClient.choose("PRODUCT");
         String url = String.format("http://%s:%s", serviceInstance.getHost(), serviceInstance.getPort()) + "/server/msg";
         RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(url, String.class);
         //第三种方式，使用@LoadBalanced注解RestTemplate Bean的方式
-        //String response = restTemplate.getForObject("http://IMOOC-PRODUCT/server/msg", String.class);
+        //String response = restTemplate.getForObject("http://PRODUCT/server/msg", String.class);
         log.info("response:{}", response);
         return response;
         /**

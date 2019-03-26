@@ -1,6 +1,6 @@
 spring:
   application:
-    name: config
+    name: config-server
   cloud:
     config:
       server:
@@ -15,7 +15,12 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://132.232.48.14:8761/eureka/
+      defaultZone: http://132.232.48.14:8761/eureka/,http://132.232.48.14:8762/eureka/,http://132.232.48.14:8763/eureka/
+  #实例在eureka注册中心的跳转地址，如果是外网地址必须要把两个都写上，如果是本地可以都不写
+  instance:
+    ip-address: 132.232.48.14
+    prefer-ip-address: true
+
 
 #咱们在访问有以下几种方式
 #1.http://localhost:8080/order-a.yml  --master分支下的order.yml文件 后面的-a可以随便改，例如可以写成-b，但是必须要
