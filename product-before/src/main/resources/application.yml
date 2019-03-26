@@ -1,7 +1,7 @@
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://132.232.48.14:8761/eureka/
 spring:
   application:
     name: productb

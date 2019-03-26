@@ -1,50 +1,29 @@
 version: "3"
 services:
-    eurekaService1:
-        image: gaojingyuan/eurekacluster
-        networks:
-        - eureka-net
-        ports:
-            - "8888:8888"
-
-environment:
-
-- spring.profiles.active=eurekaService1
-
-eurekaService2:
-
-image: gaojingyuan/eurekacluster
-
+  eurekaService1:
+    image: shyfay/eureka
+    networks:
+      - eureka-net
+    ports:
+      - "8761:8761"
+    environment:
+      - spring.profiles.active=eurekaService1
+  eurekaService2:
+    image: shyfay/eureka
+    networks:
+      - eureka-net
+    ports:
+      - "8762:8762"
+    environment:
+      - spring.profiles.active=eurekaService2
+  eurekaService3:
+    image: shyfay/eureka
+    networks:
+      - eureka-net
+    ports:
+      - "8763:8763"
+    environment:
+      - spring.profiles.active=eurekaService3
 networks:
-
-- eureka-net
-
-ports:
-
-- "8887:8887"
-
-environment:
-
-- spring.profiles.active=eurekaService2
-
-eurekaService3:
-
-image: gaojingyuan/eurekacluster
-
-networks:
-
-- eureka-net
-
-ports:
-
-- "8886:8886"
-
-environment:
-
-- spring.profiles.active=eurekaService3
-
-networks:
-
-eureka-net:
-
-driver: overlay
+  eureka-net:
+    driver: overlay
