@@ -12,6 +12,12 @@ spring:
           #git的账号密码
           username: git-mx
           password: mys160712
+  #rabbitMQ的配置信息
+  rabbitmq:
+    host: 132.232.48.14
+    port: 5672
+    username: guest
+    password: guest
 eureka:
   client:
     service-url:
@@ -22,10 +28,18 @@ eureka:
     prefer-ip-address: true
 
 
-#咱们在访问有以下几种方式
+#咱们在访问浏览器地址里面访问config配置中心的配置文件有以下几种方式
 #1.http://localhost:8080/order-a.yml  --master分支下的order.yml文件 后面的-a可以随便改，例如可以写成-b，但是必须要
 #2.http://localhost:8080/order-a.properties --master分支下的会自动转换成porterties格式的文件
 #3.http://localhost:8080/order-a.json --master分支下的会自动转换成JSON报文
 #4.http://localhost:8080/order-dev.json --master分支下的下载的就是order-dev.yml
 #5.http://localhost:8080/release/order-dev.json --release分支下的order-dev.json
 #6.打包后部署到docker中去
+
+#下面的配置是把配置中心的/actuator/bus-refresh给暴露出去让github的webhook调用
+#就是每次github在检测到有push请求时，就调用这个接口来通知config配置中心，说有push请求，配置文件已经改了
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["bus-refresh"]

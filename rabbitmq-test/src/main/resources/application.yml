@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: rabbitmq-test
+  rabbitmq:
+    host: 132.232.48.14
+    port: 5672
+    username: guest
+    password: guest
+server:
+  port: 8080
