@@ -22,9 +22,9 @@ public class StreamReceiver {
 //    }
 
     //接收对象，将如下代码注释之后，就么有消息消费者，这样消息就会一直留在rabbitMQ的队列里
-//    @StreamListener(value = Receiver.INPUT)
-//    public void process(User user) {
-//        log.info("StreamReceiver: {}", user);
-//    }
+    @StreamListener(value = Receiver.INPUT)
+    public void process(User user) {
+        log.info("StreamReceiver: {}", user);
+    }
 
 }

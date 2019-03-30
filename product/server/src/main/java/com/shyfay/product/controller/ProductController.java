@@ -1,8 +1,8 @@
 package com.shyfay.product.controller;
 
+import com.shyfay.product.common.DecreaseStockInput;
 import com.shyfay.product.dataobject.ProductCategory;
 import com.shyfay.product.dataobject.ProductInfo;
-import com.shyfay.product.dto.CartDTO;
 import com.shyfay.product.service.CategoryService;
 import com.shyfay.product.service.ProductService;
 import com.shyfay.product.utils.ResultVOUtil;
@@ -63,7 +63,7 @@ public class ProductController {
     }
 
     @RequestMapping(method= RequestMethod.POST, value="/decreaseStock")
-    public void decreaseStock(@RequestBody List<CartDTO> decreaseStockInputList) {
+    public void decreaseStock(@RequestBody List<DecreaseStockInput> decreaseStockInputList) {
         productService.decreaseStock(decreaseStockInputList);
     }
 }

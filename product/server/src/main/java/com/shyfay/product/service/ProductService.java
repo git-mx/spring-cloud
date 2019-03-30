@@ -1,7 +1,7 @@
 package com.shyfay.product.service;
 
+import com.shyfay.product.common.DecreaseStockInput;
 import com.shyfay.product.dataobject.ProductInfo;
-import com.shyfay.product.dto.CartDTO;
 
 import java.util.List;
 
@@ -26,5 +26,5 @@ public interface ProductService {
      * 扣库存
      * @param decreaseStockInputList
      */
-    void decreaseStock(List<CartDTO> decreaseStockInputList);
+    void decreaseStock(List<DecreaseStockInput> decreaseStockInputList);
 }

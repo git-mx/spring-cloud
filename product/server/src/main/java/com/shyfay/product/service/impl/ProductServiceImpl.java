@@ -1,16 +1,20 @@
 package com.shyfay.product.service.impl;
 
+import com.shyfay.product.common.DecreaseStockInput;
+import com.shyfay.product.common.ProductInfoStockOutput;
 import com.shyfay.product.dataobject.ProductInfo;
-import com.shyfay.product.dto.CartDTO;
 import com.shyfay.product.enums.ProductStatusEnum;
 import com.shyfay.product.enums.ResultEnum;
 import com.shyfay.product.exception.ProductException;
+import com.shyfay.product.message.MessageSender;
 import com.shyfay.product.repository.ProductInfoRepository;
 import com.shyfay.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +28,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductInfoRepository productInfoRepository;
 
+    @Autowired
+    MessageSender messageSender;
+
     @Override
     public List<ProductInfo> findUpAll() {
         return productInfoRepository.findByProductStatus(ProductStatusEnum.UP.getCode());
@@ -36,20 +43,30 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public void decreaseStock(List<DecreaseStockInput> decreaseStockInputList) {
+        List<ProductInfoStockOutput> productInfoStockOutputList = decreaseStockProcess(decreaseStockInputList);
+        if(!CollectionUtils.isEmpty(productInfoStockOutputList)){
+            messageSender.send(productInfoStockOutputList);
+        }
+    }
+
     @Transactional
-    public void decreaseStock(List<CartDTO> decreaseStockInputList) {
-        for(CartDTO cartDTO : decreaseStockInputList){
-            Optional<ProductInfo> productInfoOptional = productInfoRepository.findById(cartDTO.getProductId());
+    public List<ProductInfoStockOutput> decreaseStockProcess(List<DecreaseStockInput> decreaseStockInputList){
+        List<ProductInfoStockOutput> productInfoStockOutputList = new ArrayList<>();
+        for(DecreaseStockInput input : decreaseStockInputList){
+            Optional<ProductInfo> productInfoOptional = productInfoRepository.findById(input.getProductId());
             if(!productInfoOptional.isPresent()){
                 throw new ProductException(ResultEnum.PRODUCT_NOT_EXIST);
             }
             ProductInfo productInfo = productInfoOptional.get();
-            Integer stock = productInfo.getProductStock() - cartDTO.getProductQuantity();
+            Integer stock = productInfo.getProductStock() - input.getProductQuantity();
             if(stock < 0){
                 throw new ProductException(ResultEnum.PRODUCT_STOCK_ERROR);
             }
             productInfo.setProductStock(stock);
             productInfoRepository.save(productInfo);
+            productInfoStockOutputList.add(new ProductInfoStockOutput(productInfo.getProductId(), productInfo.getProductStock()));
         }
+        return productInfoStockOutputList;
     }
 }

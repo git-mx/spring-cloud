@@ -1,23 +1,27 @@
+server:
+  port: 9002
+#SpringCloudEureka服务注册中心和SpringCloudConfig配置中心的相关配置都不要写到配置中心去
 spring:
   application:
     name: order
+  #指定配置中心在服务注册中心的服务名，以及需要拉取的配置文件环境，这里拉取的是order.yml和order-dev.yml
+  #当前2.0.2的版本以及在order-dev.yml中修改配置，虽然可以自动推送到配置中心，但是这些需要刷新配置的服务
+  #并不能获取到最新的配置，必须要配置到order.yml中，才能实现动态刷新，这应该是pringCloudBus的一个bug，后续版本会解决
+  #且对于StringRedisTemplate这种启动程序时获取的配置，即使在程序运行期间在git上改了order.yml的redis配置，
+  #StringRedisTemplate的配置也不会变，因为要使动态刷新生效必须使用@RefreshScope注解
   cloud:
     config:
       discovery:
         enabled: true
         service-id: CONFIG-SERVER
       profile: dev
-  rabbitmq:
-    host: 132.232.48.14
-    port: 5672
-    username: guest
-    password: guest
-server:
-  port: 9000
-
 eureka:
   client:
     service-url:
       defaultZone: http://132.232.48.14:8761/eureka/,http://132.232.48.14:8762/eureka/,http://132.232.48.14:8763/eureka/
   instance:
     prefer-ip-address: true
+#配置eureka服务注重中心针对PRODUCT服务的ribbon负载均衡器的负载均衡策略-随机
+PRODUCTB:
+  ribbon:
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule

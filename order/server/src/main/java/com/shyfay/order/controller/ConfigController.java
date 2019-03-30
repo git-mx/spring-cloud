@@ -1,24 +1,24 @@
 package com.shyfay.order.controller;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.shyfay.order.config.RedisConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author mx
- * @since 2019/3/26
+ * @since 2019/3/27
  */
 @RestController
-@RequestMapping("/env")
-public class EnvController {
+@RequestMapping("/config")
+public class ConfigController {
 
-    @Value("${env}")
-    private String env;
+    @Autowired
+    private RedisConfig redisConfig;
 
     @RequestMapping(method= RequestMethod.GET, value="/print")
     public String print(){
-        System.out.println(env);
-        return env;
+        return "hostName: " + redisConfig.getHost() + "password:" + redisConfig.getPassword();
     }
 }
