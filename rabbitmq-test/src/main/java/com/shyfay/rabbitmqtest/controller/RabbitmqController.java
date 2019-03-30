@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @author mx
  * @since 2019/3/27
  */
-@RequestMapping("/test")
+@RequestMapping("/rabbit")
 @RestController
-public class SendController {
+public class RabbitmqController {
     @Autowired
     private AmqpTemplate amqpTemplate;
 

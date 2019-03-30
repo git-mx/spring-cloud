@@ -1,5 +1,6 @@
 package com.shyfay.rabbitmqtest.message;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -11,17 +12,18 @@ import org.springframework.stereotype.Component;
  * @since 2019/3/27
  */
 @Component
+@Slf4j
 public class ReceiverProcess {
     //1.在rabbitMQ的控制中心创建好testQueue
 //    @RabbitListener(queues="testQueue")
 //    public void receiveProcess(String message){
-//        System.out.println(message);
+//        log.info(message);
 //    }
 
     //2.在rabbitMQ的控制中心删除掉testQueue，直接在receiveProcess端定义队列
 //    @RabbitListener(queuesToDeclare = @Queue("testQueue"))
 //    public void receiveProcess(String message){
-//        System.out.println(message);
+//        log.info(message);
 //    }
 
 
@@ -31,7 +33,7 @@ public class ReceiverProcess {
 //            exchange = @Exchange("testExchange")
 //    ))
 //    public void recevieProcess(String message){
-//        System.out.println(message);
+//        log.info(message);
 //    }
 
 
@@ -45,7 +47,7 @@ public class ReceiverProcess {
 
     ))
     public void processComputer(String message){
-        System.out.println("computer: " + message);
+        log.info("computer: " + message);
     }
 
     @RabbitListener(bindings = @QueueBinding(
@@ -54,7 +56,7 @@ public class ReceiverProcess {
             value = @Queue("fruitQueue")
     ))
     public void processFruit(String message){
-        System.out.println("fruit: " + message);
+        log.info("fruit: " + message);
     }
 
 }

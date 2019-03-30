@@ -6,5 +6,17 @@ spring:
     port: 5672
     username: guest
     password: guest
+  cloud:
+    stream:
+      bindings:
+        input:
+          destination: myMessageQueue
+          #在input这里这是一个组，即将所有的消息消费者都放到一个组里，这样只要是同一个消息队列的消息，
+          #多个消费者集群的系统里，只有要一个消费者实例会收到消息
+          group: myRabbitGroup
+        output:
+          destination: myMessageQueue
+          #指定在rabbitMQ管理主页上显示的文本内容
+          contentType: application/json
 server:
   port: 8080
