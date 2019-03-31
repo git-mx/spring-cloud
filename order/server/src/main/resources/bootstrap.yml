@@ -18,10 +18,14 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://132.232.48.14:8761/eureka/,http://132.232.48.14:8762/eureka/,http://132.232.48.14:8763/eureka/
+      #defaultZone: http://132.232.48.14:8761/eureka/,http://132.232.48.14:8762/eureka/,http://132.232.48.14:8763/eureka/
+      defaultZone: http://132.232.48.14:8761/eureka/
+    fetch-registry: true
   instance:
     prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 1
+    lease-expiration-duration-in-seconds: 2
 #配置eureka服务注重中心针对PRODUCT服务的ribbon负载均衡器的负载均衡策略-随机
-PRODUCTB:
+PRODUCT:
   ribbon:
     NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule

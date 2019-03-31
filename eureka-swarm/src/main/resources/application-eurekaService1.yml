@@ -9,3 +9,6 @@ eureka:
   client:
     service-url:
       defaultZone: http://eurekaService2:8762/eureka/,http://eurekaService3:8763/eureka/
+  #生产环境关闭自我保护，这样让Eureka服务注册中心的服务能够实时刷新
+  server:
+    enable-self-preservation: false
