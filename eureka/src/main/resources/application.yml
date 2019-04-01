@@ -1,9 +1,9 @@
 eureka:
   client:
-    service-url:
-      defaultZone: http://132.232.48.14:8761/eureka/
     #将自己身注册成为client功能关闭，如果打开的话，启动server会在server管理端看到一个在线的application
     register-with-eureka: false
+    #是否检索服务
+    fetch-registry: false
   #enreka server有一个健康检查机制，即当发现某一个注册的服务经常都不在线时，就会在
   #注册中心的管理界面抛出警告给运维人员查阅，我们在开发环境可以做如下设置，来关闭警告功能
   #但是生产环境最好保持该功能开启，该功能还能保证实时剔除那些已经死掉的服务
@@ -34,8 +34,8 @@ eureka:
 #spring:
 #  application:
 #    name: eureka-server
-#server:
-#  port: 8761
+server:
+  port: 8761
 #eureka:
 #  client:
 #    register-with-eureka: false

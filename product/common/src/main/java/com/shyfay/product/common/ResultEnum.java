@@ -1,4 +1,4 @@
-package com.shyfay.product.enums;
+package com.shyfay.product.common;
 
 import lombok.Getter;
 

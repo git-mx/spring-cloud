@@ -1,7 +1,5 @@
 package com.shyfay.order.controller;
 
-import com.shyfay.order.dataobject.ProductInfo;
-import com.shyfay.order.dto.CartDTO;
 import com.shyfay.product.client.ProductClient;
 import com.shyfay.product.common.DecreaseStockInput;
 import com.shyfay.product.common.ProductInfoOutput;

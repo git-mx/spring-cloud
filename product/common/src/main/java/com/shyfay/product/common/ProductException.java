@@ -1,6 +1,6 @@
-package com.shyfay.product.exception;
+package com.shyfay.product.common;
 
-import com.shyfay.product.enums.ResultEnum;
+import com.shyfay.product.common.ResultEnum;
 
 /**
  * Created by mx

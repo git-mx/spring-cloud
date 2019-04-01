@@ -5,10 +5,13 @@ eureka:
   client:
     service-url:
       #defaultZone: http://132.232.48.14:8761/eureka/,http://132.232.48.14:8762/eureka/,http://132.232.48.14:8763/eureka/
-    defaultZone: http://132.232.48.14:8761/eureka/
+      defaultZone: http://132.232.48.14:8761/eureka/
   instance:
-    prefer-ip-address: true
+    #prefer-ip-address: true
+    #每秒向eureka服务注册中心发送一次心跳，默认值是30
     lease-renewal-interval-in-seconds: 1
+    #让eureka服务注册中心监控本服务想注册中心发送的心跳，如果2秒钟之内没有收到本服务的心跳
+    #就让服务注册中心从服务列表里将本服务剔除，默认值是90
     lease-expiration-duration-in-seconds: 2
 spring:
   application:

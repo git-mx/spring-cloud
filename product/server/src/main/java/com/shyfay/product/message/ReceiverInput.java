@@ -1,4 +1,4 @@
-package com.shyfay.order.message;
+package com.shyfay.product.message;
 
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.messaging.SubscribableChannel;
@@ -8,9 +8,9 @@ import org.springframework.messaging.SubscribableChannel;
  * @since 2019/3/30
  */
 public interface ReceiverInput {
-//    String INPUT = "input";
-//
-//    @Input(ReceiverInput.INPUT)
-//    SubscribableChannel input();
+    String INPUT = "input";
+
+    @Input(ReceiverInput.INPUT)
+    SubscribableChannel input();
 
 }

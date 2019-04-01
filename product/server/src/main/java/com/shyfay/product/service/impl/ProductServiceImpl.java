@@ -4,9 +4,9 @@ import com.shyfay.product.common.DecreaseStockInput;
 import com.shyfay.product.common.ProductInfoStockOutput;
 import com.shyfay.product.dataobject.ProductInfo;
 import com.shyfay.product.enums.ProductStatusEnum;
-import com.shyfay.product.enums.ResultEnum;
-import com.shyfay.product.exception.ProductException;
-import com.shyfay.product.message.MessageSender;
+import com.shyfay.product.common.ResultEnum;
+import com.shyfay.product.common.ProductException;
+//import com.shyfay.product.message.MessageSender;
 import com.shyfay.product.repository.ProductInfoRepository;
 import com.shyfay.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,8 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductInfoRepository productInfoRepository;
 
-    @Autowired
-    MessageSender messageSender;
+//    @Autowired
+//    MessageSender messageSender;
 
     @Override
     public List<ProductInfo> findUpAll() {
@@ -46,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
     public void decreaseStock(List<DecreaseStockInput> decreaseStockInputList) {
         List<ProductInfoStockOutput> productInfoStockOutputList = decreaseStockProcess(decreaseStockInputList);
         if(!CollectionUtils.isEmpty(productInfoStockOutputList)){
-            messageSender.send(productInfoStockOutputList);
+            //messageSender.send(productInfoStockOutputList);
         }
     }
 

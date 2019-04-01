@@ -1,4 +1,4 @@
-package com.shyfay.product.message;
+package com.shyfay.order.message;
 
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.messaging.MessageChannel;
@@ -8,8 +8,8 @@ import org.springframework.messaging.MessageChannel;
  * @since 2019/3/30
  */
 public interface SenderOutput {
-//    String OUTPUT = "output";
-//
-//    @Output(SenderOutput.OUTPUT)
-//    MessageChannel output();
+    String OUTPUT = "output";
+
+    @Output(SenderOutput.OUTPUT)
+    MessageChannel output();
 }

@@ -21,6 +21,6 @@ public class ServerController {
      */
     @GetMapping("/msg")
     public String msg(){
-        return "this is message from 8082";
+        return "this is message from 9001";
     }
 }
