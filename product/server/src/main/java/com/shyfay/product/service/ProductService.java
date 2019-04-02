@@ -1,6 +1,7 @@
 package com.shyfay.product.service;
 
 import com.shyfay.product.common.DecreaseStockInput;
+import com.shyfay.product.common.ProductInfoOutput;
 import com.shyfay.product.dataobject.ProductInfo;
 
 import java.util.List;
@@ -21,6 +22,8 @@ public interface ProductService {
      * @return
      */
     List<ProductInfo> findList(List<String> productIdList);
+
+    ProductInfoOutput findByProductId(String productId);
 
     /**
      * 扣库存

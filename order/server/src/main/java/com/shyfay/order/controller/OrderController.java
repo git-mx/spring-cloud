@@ -54,10 +54,12 @@ public class OrderController {
             throw new OrderException(ResultEnum.CART_EMPTY);
         }
 
-        OrderDTO result = orderService.create(orderDTO);
+        //OrderDTO result = orderService.create(orderDTO);
+        OrderDTO result = orderService.doOrder(orderDTO);
 
         Map<String, String> map = new HashMap<>();
-        map.put("orderId", result.getOrderId());
+        //map.put("orderId", result.getOrderId());
+        map.put("orderId", "1111");
         return ResultVOUtil.success(map);
     }
 

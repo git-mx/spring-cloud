@@ -1,6 +1,7 @@
 package com.shyfay.product.controller;
 
 import com.shyfay.product.common.DecreaseStockInput;
+import com.shyfay.product.common.ProductInfoOutput;
 import com.shyfay.product.dataobject.ProductCategory;
 import com.shyfay.product.dataobject.ProductInfo;
 import com.shyfay.product.service.CategoryService;
@@ -60,6 +61,11 @@ public class ProductController {
     @RequestMapping(method= RequestMethod.POST, value="/listForOrder")
     public List<ProductInfo> listForOrder(@RequestBody List<String> productIdList){
         return productService.findList(productIdList);
+    }
+
+    @RequestMapping(method= RequestMethod.POST, value="/findByPId")
+    public ProductInfoOutput findByProductId(@RequestBody String productId){
+        return productService.findByProductId(productId);
     }
 
     @RequestMapping(method= RequestMethod.POST, value="/decreaseStock")

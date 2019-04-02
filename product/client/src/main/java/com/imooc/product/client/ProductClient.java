@@ -23,6 +23,9 @@ public interface ProductClient {
     @RequestMapping(method = RequestMethod.POST, value="/product/listForOrder")
     List<ProductInfoOutput> listForOrder(List<String> productIdList);
 
+    @RequestMapping(method = RequestMethod.POST, value="/product/findByPId")
+    ProductInfoOutput findByPId(String productId);
+
     @RequestMapping(method=RequestMethod.POST, value="/product/decreaseStock")
     void decreaseStock(List<DecreaseStockInput> decreaseStockInputList);
 

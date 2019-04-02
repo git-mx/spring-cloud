@@ -9,29 +9,31 @@ import com.shyfay.order.enums.PayStatusEnum;
 import com.shyfay.order.message.MessageSender;
 import com.shyfay.order.repository.OrderDetailRepository;
 import com.shyfay.order.repository.OrderMasterRepository;
+import com.shyfay.order.utils.RedisUtil;
 import com.shyfay.order.service.OrderService;
 import com.shyfay.order.utils.KeyUtil;
 import com.shyfay.product.client.ProductClient;
 import com.shyfay.product.common.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * Created by mx
  * 2019-03-23 16:44
  */
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -44,12 +46,16 @@ public class OrderServiceImpl implements OrderService {
     private ProductClient productClient;
 
     @Autowired
-    private StringRedisTemplate redisTemplate;
-
-    @Autowired
     private MessageSender messageSender;
 
+    @Autowired
+    private RedisUtil redisUtil;
+
+    @Autowired
+    private OrderProcess orderProcess;
+
     private static final String PRODUCT_REDIS_KEY_PREFIX = "product:%s";
+    private static final String PRODUCT_REDIS_LOCK_KEY_PREFIX = "product-%s";
 
     /**
      * 秒杀场景的话，可以将商品信息放入的redis里面
@@ -63,6 +69,135 @@ public class OrderServiceImpl implements OrderService {
      * 5.订单主表和详情入库之后，需要发送MQ消息给商品服务去扣减MYSQL的库存，商品服务订阅该消息去扣减库存
      * 6.定时任务的补偿机制，可以写一个定时器去检测redis里面的商品库存和MYSQL库的库存是否一致，判断不一致时做出相应的补偿机制
      */
+
+    @Override
+    public OrderDTO doOrder(OrderDTO orderDTO){
+        String orderId = KeyUtil.genUniqueKey();
+        List<OrderDetail> orderDetailList = orderDTO.getOrderDetailList();
+        Map<String, Integer> successList = new HashMap<>();
+        BigDecimal orderAmont = new BigDecimal(BigInteger.ZERO);
+        for(OrderDetail orderDetail : orderDetailList){
+            ProductInfoOutput productInfoOutput = reduceRedisStock(orderDetail.getProductId(), orderDetail.getProductQuantity());
+            if(null != productInfoOutput){
+                BeanUtils.copyProperties(productInfoOutput, orderDetail);
+                successList.put(orderDetail.getProductId(), orderDetail.getProductQuantity());
+                orderDetail.setDetailId(KeyUtil.genUniqueKey());
+                orderDetail.setOrderId(orderId);
+                orderAmont = orderDetail.getProductPrice()
+                        .multiply(new BigDecimal(orderDetail.getProductQuantity()))
+                        .add(orderAmont);
+            }else{
+                if(successList.size() > 0);
+                for (String key : successList.keySet()) {
+                    rollbackRedisStock(key, successList.get(key));
+                }
+                return null;
+                //throw new ProductException(ResultEnum.PRODUCT_NOT_EXIST);
+            }
+        }
+        orderDTO.setOrderId(orderId);
+        orderDTO.setOrderAmount(orderAmont);
+        orderDTO.setOrderStatus(OrderStatusEnum.NEW.getCode());
+        orderDTO.setPayStatus(PayStatusEnum.WAIT.getCode());
+        orderProcess.updateMysql(orderDTO);
+        return orderDTO;
+    }
+
+    //异步入库和扣MYSQL库存
+
+
+
+    private void rollbackRedisStock(String productId, Integer buyQuantity){
+        String lockKey = String.format(PRODUCT_REDIS_LOCK_KEY_PREFIX, productId);
+        try {
+
+            int tryLockTime = 0;
+            while(tryLockTime < 5){
+                boolean islock = redisUtil.lock(lockKey, 300000, 300000);
+                if(islock){
+                    break;
+                }
+                //如果尝试4次加锁都失败就不要分布式锁了，直接执行
+                tryLockTime++;
+            }
+            String redisKey = String.format(PRODUCT_REDIS_KEY_PREFIX, productId);
+            String jsonStr = redisUtil.get(redisKey);
+            ProductInfoOutput productInfoOutput = JSON.parseObject(jsonStr, ProductInfoOutput.class);
+            productInfoOutput.setProductStock(productInfoOutput.getProductStock() + buyQuantity);
+            jsonStr = JSON.toJSONString(productInfoOutput);
+            redisUtil.set(redisKey, jsonStr);
+        } catch (Exception e) {
+            log.error("回滚redis库存报错", e);
+        } finally {
+            redisUtil.del(lockKey);
+            log.debug("回滚redis库存已经解锁!");
+        }
+    }
+
+//    private synchronized ProductInfoOutput reduceRedisStock(String productId, Integer buyQuantity) {
+//        String redisKey = String.format(PRODUCT_REDIS_KEY_PREFIX, productId);
+//        ProductInfoOutput productInfoOutput;
+//        String jsonStr = redisUtil.get(redisKey);
+//        //redis里面没有对应的商品，那么去调用商品服务获取商品信息
+//        if(StringUtils.isBlank(jsonStr)){
+//            productInfoOutput = productClient.findByPId(productId);
+//        }else{
+//            productInfoOutput = JSON.parseObject(jsonStr, ProductInfoOutput.class);
+//        }
+//        if(null == productInfoOutput){
+//            return null;
+//        }
+//        //库存不够，将本订单扣减的redis库存又加回来并抛出异常
+//        if(productInfoOutput.getProductStock() < buyQuantity){
+//            return null;
+//        }
+//        ProductInfoOutput returnResult = productInfoOutput;
+//        productInfoOutput.setProductStock(productInfoOutput.getProductStock() - buyQuantity);
+//        //扣减redis库存
+//        jsonStr = JSON.toJSONString(productInfoOutput);
+//        redisUtil.set(redisKey, jsonStr);
+//        return returnResult;
+//    }
+
+    private ProductInfoOutput reduceRedisStock(String productId, Integer buyQuantity) {
+        String lockKey = String.format(PRODUCT_REDIS_LOCK_KEY_PREFIX, productId);
+        try {
+            boolean islock = redisUtil.lock(lockKey, 300000, 300000);
+            if(!islock){
+                return null;
+            }
+            String redisKey = String.format(PRODUCT_REDIS_KEY_PREFIX, productId);
+            ProductInfoOutput productInfoOutput;
+            String jsonStr = redisUtil.get(redisKey);
+            //redis里面没有对应的商品，那么去调用商品服务获取商品信息
+            if(StringUtils.isBlank(jsonStr)){
+                productInfoOutput = productClient.findByPId(productId);
+            }else{
+                productInfoOutput = JSON.parseObject(jsonStr, ProductInfoOutput.class);
+            }
+            if(null == productInfoOutput){
+                return null;
+            }
+            //库存不够，将本订单扣减的redis库存又加回来并抛出异常
+            if(productInfoOutput.getProductStock() < buyQuantity){
+                return null;
+            }
+            ProductInfoOutput returnResult = productInfoOutput;
+            productInfoOutput.setProductStock(productInfoOutput.getProductStock() - buyQuantity);
+            //扣减redis库存
+            jsonStr = JSON.toJSONString(productInfoOutput);
+            redisUtil.set(redisKey, jsonStr);
+            return returnResult;
+        } catch (Exception e) {
+            log.error("扣减redis库存报错", e);
+            return null;
+        } finally {
+            redisUtil.del(lockKey);
+            log.debug("扣减redis库存已经解锁!");
+        }
+    }
+
+
     @Override
     @Transactional
     public OrderDTO create(OrderDTO orderDTO) {
@@ -74,8 +209,7 @@ public class OrderServiceImpl implements OrderService {
         List<ProductInfoStockOutput> productInfoStockOutputList = new ArrayList<>();
         for(OrderDetail orderDetail : orderDetailList){
             productIdList.add(orderDetail.getProductId());
-            String jsonStr = redisTemplate.opsForValue()
-                    .get(String.format(PRODUCT_REDIS_KEY_PREFIX, orderDetail.getProductId()));
+            String jsonStr = redisUtil.get(String.format(PRODUCT_REDIS_KEY_PREFIX, orderDetail.getProductId()));
 
             if(StringUtils.isBlank(jsonStr)){
                 redisExist =false;
@@ -83,10 +217,10 @@ public class OrderServiceImpl implements OrderService {
             ProductInfoOutput productInfoOutput = JSON.parseObject(jsonStr, ProductInfoOutput.class);
             productInfoOutputList.add(productInfoOutput);
         }
+        //查询商品信息(调用商品服务)
         if(!redisExist) {
             productInfoOutputList = productClient.listForOrder(productIdList);
         }
-        //查询商品信息(调用商品服务)
         BigDecimal orderAmont = new BigDecimal(BigInteger.ZERO);
         //可以将商品列表放入redis中
         for(OrderDetail orderDetail : orderDTO.getOrderDetailList()){
@@ -106,7 +240,7 @@ public class OrderServiceImpl implements OrderService {
                     //减库存
                     productInfo.setProductStock(productInfo.getProductStock() - orderDetail.getProductQuantity());
                     //将减掉库存的商品信息缓存到redis
-                    redisTemplate.opsForValue().set(String.format(PRODUCT_REDIS_KEY_PREFIX, productInfo.getProductId()), JSON.toJSONString(productInfo));
+                    redisUtil.set(String.format(PRODUCT_REDIS_KEY_PREFIX, productInfo.getProductId()), JSON.toJSONString(productInfo));
                     productInfoStockOutputList.add(new ProductInfoStockOutput(orderDetail.getProductId(), orderDetail.getProductQuantity()));
                 }
             }

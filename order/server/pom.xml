@@ -10,8 +10,7 @@
     <groupId>com.shyfay</groupId>
     <artifactId>order-server</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>server</name>
-    <description>Demo project for Spring Boot</description>
+    <packaging>war</packaging>
 
     <properties>
         <java.version>1.8</java.version>

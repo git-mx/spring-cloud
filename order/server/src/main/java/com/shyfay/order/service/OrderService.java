@@ -15,4 +15,6 @@ public interface OrderService {
      */
     OrderDTO create(OrderDTO orderDTO);
 
+    OrderDTO doOrder(OrderDTO orderDTO);
+
 }

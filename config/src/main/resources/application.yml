@@ -14,17 +14,17 @@ spring:
           password: mys160712
   #rabbitMQ的配置信息
   rabbitmq:
-    host: 132.232.48.14
+    host: 192.168.99.1
     port: 5672
     username: guest
     password: guest
 eureka:
   client:
     service-url:
-      defaultZone: http://132.232.48.14:8761/eureka/,http://132.232.48.14:8762/eureka/,http://132.232.48.14:8763/eureka/
+      defaultZone: http://localhost:8761/eureka/
   #实例在eureka注册中心的跳转地址，如果是外网地址必须要把两个都写上，如果是本地可以都不写
   instance:
-    ip-address: 132.232.48.14
+    ip-address: 192.168.99.1
     prefer-ip-address: true
 
 

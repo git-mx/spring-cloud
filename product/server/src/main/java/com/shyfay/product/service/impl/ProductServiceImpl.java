@@ -1,14 +1,12 @@
 package com.shyfay.product.service.impl;
 
-import com.shyfay.product.common.DecreaseStockInput;
-import com.shyfay.product.common.ProductInfoStockOutput;
+import com.shyfay.product.common.*;
 import com.shyfay.product.dataobject.ProductInfo;
 import com.shyfay.product.enums.ProductStatusEnum;
-import com.shyfay.product.common.ResultEnum;
-import com.shyfay.product.common.ProductException;
 //import com.shyfay.product.message.MessageSender;
 import com.shyfay.product.repository.ProductInfoRepository;
 import com.shyfay.product.service.ProductService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -40,6 +38,18 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductInfo> findList(List<String> productIdList){
         List<ProductInfo> productInfoList = productInfoRepository.findByProductIdIn(productIdList);
         return productInfoList;
+    }
+
+    @Override
+    public ProductInfoOutput findByProductId(String productId) {
+        Optional<ProductInfo> productInfoOptional = productInfoRepository.findById(productId);
+        if(!productInfoOptional.isPresent()){
+            throw new ProductException(ResultEnum.PRODUCT_NOT_EXIST);
+        }
+        ProductInfo productInfo = productInfoOptional.get();
+        ProductInfoOutput productInfoOutput = new ProductInfoOutput();
+        BeanUtils.copyProperties(productInfo, productInfoOutput);
+        return productInfoOutput;
     }
 
     @Override

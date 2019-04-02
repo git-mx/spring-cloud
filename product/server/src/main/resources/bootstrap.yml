@@ -1,11 +1,11 @@
 server:
-  port: 9001
+  port: 8081
 #SpringCloudEureka服务注册中心和SpringCloudConfig配置中心的相关配置都不要写到配置中心去
 eureka:
   client:
     service-url:
       #defaultZone: http://132.232.48.14:8761/eureka/,http://132.232.48.14:8762/eureka/,http://132.232.48.14:8763/eureka/
-      defaultZone: http://132.232.48.14:8761/eureka/
+      defaultZone: http://127.0.0.1:8761/eureka/
   instance:
     #prefer-ip-address: true
     #每秒向eureka服务注册中心发送一次心跳，默认值是30
