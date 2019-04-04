@@ -1,3 +1,4 @@
+
 spring:
   application:
     name: config-server
@@ -43,3 +44,7 @@ management:
     web:
       exposure:
         include: ["bus-refresh"]
+#使用jar包构建docker一定要加上server.port，并且在创建容器的时候一定要指定成 -p 8081:8081，
+#否则docker容器默认启动的是8080端口，因为在本文件不指定端口的话默认就是8080
+server:
+  port: 8081
