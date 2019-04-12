@@ -26,4 +26,4 @@ PRODUCT:
   ribbon:
     NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RoundRule
 server:
-  port: 8082
+  port: 9001

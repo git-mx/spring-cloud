@@ -105,7 +105,7 @@ public class RedisUtil {
      * 只需要47秒，而外网redis需要110多秒，如果是外网的redis连接，都执行2000条并发请求
      * 这个redis分布式锁可能比JAVA自带的同步synchronized还要慢，但是如果是局域网的redis是肯定比synchronized快很多的。
      * 可能搭建集群和在服务器环境的话，速度会比这个快很多，毕竟我这是在自己的windows个人电脑上做的测试
-     * 
+     *
      */
     public boolean lock(final String key, int expireTime, int timeoutTime){
         int timeout = timeoutTime;

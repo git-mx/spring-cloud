@@ -13,8 +13,6 @@ spring:
         enabled: true
         service-id: CONFIG-SERVER
       profile: dev
-  datasource:
-    type: org.springframework.jdbc.datasource.DelegatingDataSource
 eureka:
   client:
     service-url:
