@@ -1,0 +1,40 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://132.232.48.14:8761/eureka/
+  instance:
+    prefer-ip-address: true
+spring:
+  application:
+    name: api-gateway
+server:
+  port: 8082
+#自定义路由，也可以把自定义路由放到config服务配置中心去
+zuul:
+  host:
+    connect-timeout-millis: 60000
+    socket-timeout-millis: 60000
+  routes:
+    #路由规则的名字，这个名字可以随便起
+    aaaa:
+      #设置之定义访问路径
+      path: /myProduct/**
+      #以eureka服务注册中心的服务名进行访问
+      serviceId: product
+      #直接以url访问
+      #url: http://localhost:9001
+  #配置不能通过网关来访问的服务接口，即让product服务的/product/listForOrder接口不能通过网关来访问
+  ignored-patterns:
+    - /product/product/listForOrder
+    - /myProduct/product/listForOrder
+#从api-gatway去访问config服务的接口时，比如/order-dev.yml会报超时错误
+#加上如下配置即可，在服务网关中也可以指定特定服务的负载均衡策略
+config:
+  ribbon:
+    NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
+    #可以直接指定服务地址
+    #listOfServers: http://example1.com,http://example2.com
+    ConnectTimeout: 60000
+    ReadTimeout: 60000
+    MaxTotalHttpConnections: 500
+    MaxConnectionsPerHost: 100

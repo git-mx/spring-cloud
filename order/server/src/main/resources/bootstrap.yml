@@ -11,7 +11,7 @@ spring:
     config:
       discovery:
         enabled: true
-        service-id: CONFIG-SERVER
+        service-id: config
       profile: dev
 eureka:
   client:
