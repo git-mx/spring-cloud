@@ -1,0 +1,19 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://132.232.48.14:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 1
+    lease-expiration-duration-in-seconds: 2
+spring:
+  application:
+    name: user
+  cloud:
+    config:
+      discovery:
+        service-id: config
+        enabled: true
+      profile: dev
+server:
+  port: 9003

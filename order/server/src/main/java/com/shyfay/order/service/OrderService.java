@@ -17,4 +17,6 @@ public interface OrderService {
 
     OrderDTO doOrder(OrderDTO orderDTO);
 
+    OrderDTO finish(String orderId);
+
 }

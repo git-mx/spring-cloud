@@ -6,7 +6,9 @@ import com.shyfay.order.dataobject.OrderMaster;
 import com.shyfay.order.dto.OrderDTO;
 import com.shyfay.order.enums.OrderStatusEnum;
 import com.shyfay.order.enums.PayStatusEnum;
+import com.shyfay.order.exception.OrderException;
 import com.shyfay.order.message.MessageSender;
+import com.shyfay.order.message.ReceiverInput;
 import com.shyfay.order.repository.OrderDetailRepository;
 import com.shyfay.order.repository.OrderMasterRepository;
 import com.shyfay.order.utils.RedisUtil;
@@ -19,14 +21,12 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by mx
@@ -69,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
      * 5.订单主表和详情入库之后，需要发送MQ消息给商品服务去扣减MYSQL的库存，商品服务订阅该消息去扣减库存
      * 6.定时任务的补偿机制，可以写一个定时器去检测redis里面的商品库存和MYSQL库的库存是否一致，判断不一致时做出相应的补偿机制
      */
-
+    //只能买家访问
     @Override
     public OrderDTO doOrder(OrderDTO orderDTO){
         String orderId = KeyUtil.genUniqueKey();
@@ -198,6 +198,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    //只能买家访问
     @Override
     @Transactional
     public OrderDTO create(OrderDTO orderDTO) {
@@ -264,6 +265,30 @@ public class OrderServiceImpl implements OrderService {
         orderMasterRepository.save(orderMaster);
         //发送消息到商品服务扣减MYSQL库存
         messageSender.send(productInfoStockOutputList);
+        return orderDTO;
+    }
+
+    //完结订单, 只能卖家访问
+    @Override
+    public OrderDTO finish(String orderId) {
+        Optional<OrderMaster> optionalOrderMaster = orderMasterRepository.findById(orderId);
+        if(!optionalOrderMaster.isPresent()){
+            throw new OrderException(com.shyfay.order.enums.ResultEnum.ORDER_NOT_EXIST);
+        }
+        OrderMaster orderMaster = optionalOrderMaster.get();
+        if(OrderStatusEnum.NEW.getCode() != orderMaster.getOrderStatus()){
+            throw new OrderException(com.shyfay.order.enums.ResultEnum.ORDER_STATUS_ERROR);
+        }
+        orderMaster.setOrderStatus(OrderStatusEnum.FINISHED.getCode());
+        orderMasterRepository.save(orderMaster);
+
+        OrderDTO orderDTO = new OrderDTO();
+        BeanUtils.copyProperties(orderMaster, orderDTO);
+        List<OrderDetail> orderDetailList = orderDetailRepository.findByOrderId(orderId);
+        if(CollectionUtils.isEmpty(orderDetailList)){
+            throw new OrderException(com.shyfay.order.enums.ResultEnum.ORDER_DETAIL_NOT_EXIST);
+        }
+        orderDTO.setOrderDetailList(orderDetailList);
         return orderDTO;
     }
 }

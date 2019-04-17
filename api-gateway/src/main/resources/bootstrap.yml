@@ -7,10 +7,16 @@ eureka:
 spring:
   application:
     name: api-gateway
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: redispassword!@#
 server:
   port: 8082
-#自定义路由，也可以把自定义路由放到config服务配置中心去
+#自定义路由，也可以把自定义路由放到config服务配置中心去实现动态路由
 zuul:
+  #设置全局的敏感头，即将所有通过网关的请求都可将cookie等敏感头传递给接口
+  sensitive-headers:
   host:
     connect-timeout-millis: 60000
     socket-timeout-millis: 60000
@@ -18,11 +24,23 @@ zuul:
     #路由规则的名字，这个名字可以随便起
     aaaa:
       #设置之定义访问路径
-      path: /myProduct/**
+      #path: /myProduct/**
+      path: /product/**
       #以eureka服务注册中心的服务名进行访问
       serviceId: product
       #直接以url访问
       #url: http://localhost:9001
+      #敏感头过滤，默认zuul是将"Cookie", "Set-Cookie", "Authorization"这些敏感头都过滤掉了的
+      #所谓过滤是什么意思呢，就是比如访问order服务的finish接口需要将cookie传递到接口里面去，但是如果
+      #通过api-gateway来访问order服务的finish接口，同事api-gateway设置了敏感头过滤掉了cookie。那么请求的cookie是无法传递到接口里去的
+      #这里将敏感头设置为空的话，就可以通过网关接口将cookie等敏感头传递到接口中了
+      #sensitiveHeaders:
+    bbbb:
+      path: /user/**
+      serviceId: user
+    cccc:
+      path: /order/**
+      serviceId: order
   #配置不能通过网关来访问的服务接口，即让product服务的/product/listForOrder接口不能通过网关来访问
   ignored-patterns:
     - /product/product/listForOrder
