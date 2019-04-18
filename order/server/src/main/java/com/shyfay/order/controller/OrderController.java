@@ -61,9 +61,34 @@ public class OrderController {
         return ResultVOUtil.success(map);
     }
 
+    @PostMapping("/create1")
+    public ResultVO<Map<String, String>> create1(@Valid OrderForm orderForm,
+                                                BindingResult bindingResult) {
+        if (bindingResult.hasErrors()){
+            log.error("【创建订单】参数不正确, orderForm={}", orderForm);
+            throw new OrderException(ResultEnum.PARAM_ERROR.getCode(),
+                    bindingResult.getFieldError().getDefaultMessage());
+        }
+        // orderForm -> orderDTO
+        OrderDTO orderDTO = OrderForm2OrderDTOConverter.convert(orderForm);
+        if (CollectionUtils.isEmpty(orderDTO.getOrderDetailList())) {
+            log.error("【创建订单】购物车信息为空");
+            throw new OrderException(ResultEnum.CART_EMPTY);
+        }
+
+        //OrderDTO result = orderService.create(orderDTO);
+        OrderDTO result = orderService.create(orderDTO);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("orderId", result.getOrderId());
+        return ResultVOUtil.success(map);
+    }
+
     @RequestMapping(value="/finish", method = RequestMethod.GET)
     public ResultVO<OrderDTO> finish(@RequestParam("orderId")String orderId){
         return ResultVOUtil.success(orderService.finish(orderId));
     }
+
+
 
 }

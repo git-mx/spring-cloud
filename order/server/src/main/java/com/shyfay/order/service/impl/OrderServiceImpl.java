@@ -27,6 +27,7 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by mx
@@ -250,11 +251,11 @@ public class OrderServiceImpl implements OrderService {
         //入库orderDetail
         orderDetailRepository.saveAll(orderDTO.getOrderDetailList());
         //扣库存(调用商品服务)
-//        List<DecreaseStockInput> decreaseStockInputList = orderDTO.getOrderDetailList().stream()
-//                .map(e -> new DecreaseStockInput(e.getProductId(), e.getProductQuantity()))
-//                .collect(Collectors.toList());
+        List<DecreaseStockInput> decreaseStockInputList = orderDTO.getOrderDetailList().stream()
+                .map(e -> new DecreaseStockInput(e.getProductId(), e.getProductQuantity()))
+                .collect(Collectors.toList());
         //在高并发的情况下，去调用商品服务扣减库存就会导致数据失真的情况
-        //productClient.decreaseStock(decreaseStockInputList);
+        productClient.decreaseStock(decreaseStockInputList);
         //订单入库
         OrderMaster orderMaster = new OrderMaster();
         orderDTO.setOrderId(orderId);
@@ -264,7 +265,7 @@ public class OrderServiceImpl implements OrderService {
         orderMaster.setPayStatus(PayStatusEnum.WAIT.getCode());
         orderMasterRepository.save(orderMaster);
         //发送消息到商品服务扣减MYSQL库存
-        messageSender.send(productInfoStockOutputList);
+        //messageSender.send(productInfoStockOutputList);
         return orderDTO;
     }
 

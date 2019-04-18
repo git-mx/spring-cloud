@@ -13,6 +13,16 @@ spring:
         enabled: true
         service-id: config
       profile: dev
+  #配置zipkin服务地址，在实际开发中这些配置都应该配置到config配置中心中去
+  zipkin:
+    base-url: http://132.232.48.14:9411
+    #如果项目配置了rabbitMQ,那么sleuth默认会将调用链信息发送到rabbitMQ上面去
+    #这里需要手动设置一下让sleuth将调用链信息发送到zipkin
+    sender:
+      type: web
+  sleuth:
+    sampler:
+      probability: 1
 eureka:
   client:
     service-url:

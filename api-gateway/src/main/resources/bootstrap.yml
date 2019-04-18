@@ -56,3 +56,17 @@ config:
     ReadTimeout: 60000
     MaxTotalHttpConnections: 500
     MaxConnectionsPerHost: 100
+
+#配置zuul访问请求的超时时间，由于zuul集成了hystrix，所以直接设置hystrix的超时时间即可
+#zuul很多时候在网关服务刚启动时，第一次去访问某个服务的接口例如/product/product/list
+#会报超时的错误，这是因为去调用/product/product/list这个接口需要加载一些product服务的类
+#但是这些类并不会在网关服务启动的时候由类加载器去加载，而是在第一次访问服务接口的时候再去加载的。
+#这时我们第一次去访问/product/product/list这接口时，当网关服务还没有加载完成product项目的这些类时，接口就超时了
+hystrix:
+  command:
+    #全局的超时时间
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000

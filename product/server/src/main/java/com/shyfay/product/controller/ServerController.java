@@ -2,6 +2,7 @@ package com.shyfay.product.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -19,10 +20,16 @@ public class ServerController {
      *  负载均衡器Ribbon的默认负载均衡策略是轮询方式。
      *
      */
-    @GetMapping("/msg")
+    @RequestMapping(value = "/msg", method = RequestMethod.GET)
     public String msg() throws InterruptedException {
         //设置超时
         Thread.sleep(2000);
         return "this is message from 9001";
     }
+
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public String test() throws InterruptedException {
+        return "this is message from 9001";
+    }
+
 }
