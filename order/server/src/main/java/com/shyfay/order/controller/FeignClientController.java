@@ -30,10 +30,10 @@ public class FeignClientController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value="/listForOrder")
-    public String listForOrder(){
+    public List<ProductInfoOutput> listForOrder(){
         List<ProductInfoOutput> response = feignClient.listForOrder(Arrays.asList("157875196366160022","157875227953464068"));
         log.info("response={}", response);
-        return "OK";
+        return response;
     }
 
     @RequestMapping(method= RequestMethod.GET, value="/decreaseStock")

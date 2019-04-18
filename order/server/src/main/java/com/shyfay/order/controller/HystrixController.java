@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
  * @since 2019/4/18
  */
 @RestController
-@RequestMapping("hystrix")
+@RequestMapping("hys")
 @DefaultProperties(defaultFallback = "defaultFallBack")
 public class HystrixController {
 
@@ -26,16 +26,18 @@ public class HystrixController {
     //将product服务的/server/msg这个接口设置Thread.sleep(2000),如果不做以下设置的话会超时
     //default_executionTimeoutInMilliseconds 默认值是1000，即1秒超时。
     //这里可以根据不同的业务类型设置不同的超时时间。例如扣款、发送短信、等耗时的服务就将超时时间设置长一点
-    @HystrixCommand(commandProperties = {
-            @HystrixProperty(name="execution.isolation.thread.timeoutInMilliseconds", value="3000")
-    })
-    public String HystrixCommandTest(){
+    //@HystrixCommand(commandProperties = {
+    //        @HystrixProperty(name="execution.isolation.thread.timeoutInMilliseconds", value="3000")
+    //})
+    //将超时时间写到配置文件中去，这里也可以不ongoing写commandKey但是比需要将配置中的key写成方法名hystrixCommandTest
+    @HystrixCommand(commandKey="aaaa")
+    public String hystrixCommandTest(){
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate.getForObject("http://localhost:9001/server/msg", String.class);
     }
 
     /**
-     * 服务熔断
+     * 服务熔断，服务熔断的目的是保护服务器
      * hystrix熔断机制重断路器（circuitBreaker）有三种状态：1.Open 2.Close 3.Half Open
      * - 当断路器处于Open状态时，所有的请求过来之后都直接走降级方法不会去执行业务主方法，
      *                     意思就是直接去执行defaultFallBack，而不执行HystrixCircuitBreakerTest方法体的内容
@@ -60,7 +62,7 @@ public class HystrixController {
             @HystrixProperty(name="circuitBreaker.errorThresholdPercentage", value="60")
     })
     @RequestMapping(value="test2", method=RequestMethod.GET)
-    public String HystrixCircuitBreakerTest(@RequestParam("number")Integer number){
+    public String hystrixCircuitBreakerTest(@RequestParam("number")Integer number){
         if(number % 2 == 0){
             return "成功";
         }

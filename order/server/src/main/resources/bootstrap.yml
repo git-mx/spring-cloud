@@ -30,5 +30,28 @@ eureka:
 PRODUCT:
   ribbon:
     NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+hystrix:
+  command:
+    #全局的超时时间
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 1000
+    #特定方法的超时时间,在@HystrixCommand注解中可以使用@CommandKey注解来指定配置项
+    #hystrixCommandTest:
+    aaaa:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3000
+#配置feign-hystrix
+feign:
+  hystrix:
+    enabled: true
+#
+#management:
+#  content-path: /
+
 server:
   port: 9002

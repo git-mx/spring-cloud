@@ -14,7 +14,9 @@ import java.util.List;
  * @author mx
  * @since 2019/3/24
  */
-@FeignClient("PRODUCT")
+//@FeignClient(value = "PRODUCT")
+//配置feign-hystrix，feign它是自带hystrix，所以不需要额外的pom依赖
+@FeignClient(value = "PRODUCT", fallback = ProductClient.ProductClientFallBack.class)
 @Component
 public interface ProductClient {
     @RequestMapping(method= RequestMethod.GET, value="/server/msg")
@@ -28,5 +30,28 @@ public interface ProductClient {
 
     @RequestMapping(method=RequestMethod.POST, value="/product/decreaseStock")
     void decreaseStock(List<DecreaseStockInput> decreaseStockInputList);
+
+    @Component
+    class ProductClientFallBack implements ProductClient {
+        @Override
+        public String getMessageFromProduct() {
+            return null;
+        }
+
+        @Override
+        public List<ProductInfoOutput> listForOrder(List<String> productIdList) {
+            return null;
+        }
+
+        @Override
+        public ProductInfoOutput findByPId(String productId) {
+            return null;
+        }
+
+        @Override
+        public void decreaseStock(List<DecreaseStockInput> decreaseStockInputList) {
+
+        }
+    }
 
 }
