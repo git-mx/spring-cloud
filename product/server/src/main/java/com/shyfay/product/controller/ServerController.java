@@ -20,7 +20,9 @@ public class ServerController {
      *
      */
     @GetMapping("/msg")
-    public String msg(){
+    public String msg() throws InterruptedException {
+        //设置超时
+        Thread.sleep(2000);
         return "this is message from 9001";
     }
 }

@@ -16,6 +16,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 /**
+ * 买家鉴权，
  * @author mx
  * @since 2019/4/17
  */
@@ -31,13 +32,11 @@ public class BuyerAuthFilter extends ZuulFilter {
         return PRE_DECORATION_FILTER_ORDER - 1;
     }
 
+    //这里可以改来将路径放到config配置中心去，实现动态鉴权
     @Override
     public boolean shouldFilter() {
         HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
-        if("/order/order/create".equals(request.getRequestURI())){
-            return true;
-        }
-        return false;
+        return "/order/order/create".equals(request.getRequestURI());
     }
 
     @Override

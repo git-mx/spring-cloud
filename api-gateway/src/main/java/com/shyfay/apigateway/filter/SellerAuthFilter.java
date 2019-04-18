@@ -15,6 +15,8 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 /**
+ * 卖家鉴权
+ *
  * @author mx
  * @since 2019/4/17
  */
@@ -30,6 +32,7 @@ public class SellerAuthFilter extends ZuulFilter {
         return PRE_DECORATION_FILTER_ORDER - 2;
     }
 
+    //可以将需要鉴权的路径放到config配置中心区，实现动态鉴权
     @Override
     public boolean shouldFilter() {
         return "/order/order/finish".equals(RequestContext.getCurrentContext().getRequest().getRequestURI());
