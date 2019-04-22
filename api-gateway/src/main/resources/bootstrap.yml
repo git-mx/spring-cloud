@@ -1,18 +1,25 @@
 eureka:
   client:
     service-url:
-      defaultZone: http://132.232.48.14:8761/eureka/
+      #外网地址
+      #defaultZone: http://132.232.48.14:8761/eureka/
+      #部署到rancher上
+      defaultZone: http://eureka1:8761/eureka/,http://eureka2:8762/eureka/
   instance:
     prefer-ip-address: true
 spring:
   application:
     name: api-gateway
   redis:
-    host: 127.0.0.1
+    #本地
+    #host: 127.0.0.1
+    #部署到rancher上
+    host: 192.168.5.113
     port: 6379
     password: redispassword!@#
-server:
-  port: 8082
+#部署到rancher上不需要配置端口，否则需要放开端口
+#server:
+#  port: 8082
 #自定义路由，也可以把自定义路由放到config服务配置中心去实现动态路由
 zuul:
   #设置全局的敏感头，即将所有通过网关的请求都可将cookie等敏感头传递给接口

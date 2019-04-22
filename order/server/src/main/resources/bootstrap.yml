@@ -27,7 +27,10 @@ eureka:
   client:
     service-url:
       #defaultZone: http://132.232.48.14:8761/eureka/,http://132.232.48.14:8762/eureka/,http://132.232.48.14:8763/eureka/
-      defaultZone: http://132.232.48.14:8761/eureka/
+      #远程机器
+      #defaultZone: http://132.232.48.14:8761/eureka/
+      #部署绕rancher上之后
+      defaultZone: http://eureka1:8761/eureka/,http://eureka2:8762/eureka2/
     #fetch-registry: true
   instance:
     prefer-ip-address: true

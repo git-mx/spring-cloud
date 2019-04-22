@@ -1,0 +1,17 @@
+eureka:
+  client:
+    service-url:
+      #在本地运行就使用如下命令
+      #defaultZone: http://localhost:8762/eureka/
+      #在rancher上跑使用如下命令
+      defaultZone: http://eureka2:8762/eureka/
+
+    fetch-registry: false
+    register-with-eureka: false
+  server:
+    enable-self-preservation: false
+spring:
+  application:
+    name: eureka
+server:
+  port: 8761
