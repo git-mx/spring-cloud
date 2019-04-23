@@ -4,9 +4,9 @@ eureka:
     service-url:
       #defaultZone: http://132.232.48.14:8761/eureka/,http://132.232.48.14:8762/eureka/,http://132.232.48.14:8763/eureka/
       #外网访问
-      #defaultZone: http://132.232.48.14:8761/eureka/
+      defaultZone: http://132.232.48.14:8761/eureka/
       #在rancher上访问
-      defaultZone: http://eureka1:9871/eureka/,http://eureka2:8762/eureka/
+      #defaultZone: http://eureka1:9871/eureka/,http://eureka2:8762/eureka/
   instance:
     #prefer-ip-address: true
     #每秒向eureka服务注册中心发送一次心跳，默认值是30
