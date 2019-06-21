@@ -11,6 +11,8 @@ public class ProductInfoStockOutput {
     private String productId;
     private Integer productStock;
 
+    public ProductInfoStockOutput(){}
+
     public ProductInfoStockOutput(String productId, Integer productStock){
         this.productId = productId;
         this.productStock = productStock;

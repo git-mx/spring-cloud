@@ -11,6 +11,7 @@ import com.shyfay.order.message.MessageSender;
 import com.shyfay.order.message.ReceiverInput;
 import com.shyfay.order.repository.OrderDetailRepository;
 import com.shyfay.order.repository.OrderMasterRepository;
+import com.shyfay.order.utils.DefaultRedisLock;
 import com.shyfay.order.utils.RedisUtil;
 import com.shyfay.order.service.OrderService;
 import com.shyfay.order.utils.KeyUtil;
@@ -51,6 +52,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    private DefaultRedisLock redisLock;
 
     @Autowired
     private OrderProcess orderProcess;
@@ -109,12 +113,14 @@ public class OrderServiceImpl implements OrderService {
 
 
     private void rollbackRedisStock(String productId, Integer buyQuantity){
-        String lockKey = String.format(PRODUCT_REDIS_LOCK_KEY_PREFIX, productId);
+        //String lockKey = String.format(PRODUCT_REDIS_LOCK_KEY_PREFIX, productId);
+        String lockKey = productId;
         try {
 
             int tryLockTime = 0;
             while(tryLockTime < 5){
-                boolean islock = redisUtil.lock(lockKey, 300000, 300000);
+                //boolean islock = redisUtil.lock(lockKey, 300000, 300000);
+                boolean islock = redisLock.tryLock(lockKey, 60);
                 if(islock){
                     break;
                 }
@@ -130,7 +136,8 @@ public class OrderServiceImpl implements OrderService {
         } catch (Exception e) {
             log.error("回滚redis库存报错", e);
         } finally {
-            redisUtil.del(lockKey);
+            //redisUtil.del(lockKey);
+            redisLock.unlock(lockKey);
             log.debug("回滚redis库存已经解锁!");
         }
     }
@@ -161,9 +168,11 @@ public class OrderServiceImpl implements OrderService {
 //    }
 
     private ProductInfoOutput reduceRedisStock(String productId, Integer buyQuantity) {
-        String lockKey = String.format(PRODUCT_REDIS_LOCK_KEY_PREFIX, productId);
+        //String lockKey = String.format(PRODUCT_REDIS_LOCK_KEY_PREFIX, productId);
+        String lockKey = productId;
         try {
-            boolean islock = redisUtil.lock(lockKey, 300000, 300000);
+            //boolean islock = redisUtil.lock(lockKey, 300000, 300000);
+            boolean islock = redisLock.tryLock(lockKey, 60);
             if(!islock){
                 return null;
             }
@@ -193,7 +202,8 @@ public class OrderServiceImpl implements OrderService {
             log.error("扣减redis库存报错", e);
             return null;
         } finally {
-            redisUtil.del(lockKey);
+            //redisUtil.del(lockKey);
+            redisLock.unlock(lockKey);
             log.debug("扣减redis库存已经解锁!");
         }
     }

@@ -26,18 +26,20 @@ eureka:
   client:
     service-url:
       #本地测试或者一般部署使用如下配置
-      #defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
       #使用rancher部署，使用以下配置8761:前面那个eureka单词必须要跟rancher里面的服务名称一样
       #defaultZone: http://eureka:8761/eureka/
       #使用rancher部署，如果erueka是多台的
-      defaultZone: http://eureka1:8761/eureka/,http://eureka2:8762/eureka/
+      #defaultZone: http://eureka1:8761/eureka/,http://eureka2:8762/eureka/
   #实例在eureka注册中心的跳转地址，如果是外网地址必须要把两个都写上，如果是本地可以都不写
   instance:
     #部署到具体服务器上时
     #ip-address: 132.232.48.14
     #部署到rancher的docker容器时，填写RancherAgent的主机IP地址
-    ip-address: 192.168.5.99
+    #ip-address: 192.168.5.99
     prefer-ip-address: true
+    lease-expiration-duration-in-seconds: 2
+    lease-renewal-interval-in-seconds: 1
 
 
 #咱们在访问浏览器地址里面访问config配置中心的配置文件有以下几种方式

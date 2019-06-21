@@ -23,7 +23,7 @@ public class RabbitmqController {
     }
 
     //指定发送的key，接收进程使用key来接收不同订单的消息
-    @RequestMapping(method= RequestMethod.GET, value="send2")
+    @RequestMapping(method= RequestMethod.GET, value="/send2")
     public void send2(@RequestParam("type")Integer type, @RequestParam("message")String message){
         if(type.equals(1)){
             amqpTemplate.convertAndSend("myOrder", "computer", message);
