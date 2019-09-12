@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: zk-client
+  cloud:
+    zookeeper:
+      connect-string: 132.232.48.14:2181
+      discovery:
+        register: true
+        enabled: true
+        instance-id: 1
+        root: /spz
+server:
+  port: 8082
